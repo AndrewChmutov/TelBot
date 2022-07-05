@@ -61,7 +61,7 @@ public class MainBot extends TelegramLongPollingBot{
 				
 				switch(command)
 				{
-					case "/choose_object":
+					case "/choose_joke":
 //						List<List<InlineKeyboardButton>> buttons= new ArrayList<>();
 //						buttons.add(
 //								 
