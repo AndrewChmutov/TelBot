@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -22,14 +23,16 @@ public class MainBot extends TelegramLongPollingBot{
 	
 	public void onUpdateReceived(Update update)
 	{
-		if(update.hasMessage())
+		
+		try
 		{
-			try {
-				handleMessage(update.getMessage());
-			} catch (TelegramApiException e) {
-				e.printStackTrace();
-			}
+			handleMessage(update.getMessage());
 		}
+		catch(TelegramApiException e)
+		{
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public void handleMessage(Message message) throws TelegramApiException
@@ -50,13 +53,27 @@ public class MainBot extends TelegramLongPollingBot{
 //						buttons.add(
 //								 
 //						)
+						List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 						
-						execute(SendMessage.builder().text("Choose type of stalker::").chatId(message.getChatId().toString()).build());
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Free stalker").callbackData("TARGET").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Duty").callbackData("TARGET").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Freedom").callbackData("TARGET").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Mutant").callbackData("TARGET").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Everyone").callbackData("TARGET").build()));
+				
+						
+						execute(SendMessage.builder()
+								.text("Choose type of story:")
+								.chatId(message.getChatId().toString())
+								.replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
+								.build());
 				}
 				return;
 			}
 		}
 	}
+	
+	
 	
 	public String getBotUsername()
 	{
