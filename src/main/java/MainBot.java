@@ -3,6 +3,7 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -23,19 +24,31 @@ public class MainBot extends TelegramLongPollingBot{
 	
 	public void onUpdateReceived(Update update)
 	{
-		
-		try
+		if(update.hasCallbackQuery())
 		{
-			handleMessage(update.getMessage());
+			try
+			{
+				handleCallbackquery(update.getCallbackQuery());
+			}
+			catch(TelegramApiException e)
+			{
+				e.printStackTrace();
+			}
 		}
-		catch(TelegramApiException e)
+		else if (update.hasMessage())
 		{
-			e.printStackTrace();
+			try
+			{
+				handleMessage(update.getMessage());
+			}
+			catch(TelegramApiException e)
+			{
+				e.printStackTrace();
+			}
 		}
-		
 	}
 	
-	public void handleMessage(Message message) throws TelegramApiException
+	private void handleMessage(Message message) throws TelegramApiException
 	{
 		if (message.hasText() && message.hasEntities())
 		{
@@ -55,11 +68,11 @@ public class MainBot extends TelegramLongPollingBot{
 //						)
 						List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 						
-						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Free stalker").callbackData("TARGET").build()));
-						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Duty").callbackData("TARGET").build()));
-						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Freedom").callbackData("TARGET").build()));
-						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Mutant").callbackData("TARGET").build()));
-						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Everyone").callbackData("TARGET").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Free stalker").callbackData("Free stalker").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Duty").callbackData("Duty").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Freedom").callbackData("Freedom").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Mutant").callbackData("Mutant").build()));
+						buttons.add(Arrays.asList(InlineKeyboardButton.builder().text("Everyone").callbackData("Everyone").build()));
 				
 						
 						execute(SendMessage.builder()
@@ -71,6 +84,13 @@ public class MainBot extends TelegramLongPollingBot{
 				return;
 			}
 		}
+	}
+	
+	private void handleCallbackquery(CallbackQuery callbackquery) throws TelegramApiException
+	{
+		Message message = callbackquery.getMessage();
+		String data = callbackquery.getData();
+		execute(SendMessage.builder().text(data).chatId(message.getChatId().toString()).build());
 	}
 	
 	
